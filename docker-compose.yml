@@ -1,0 +1,51 @@
+version: '3.7'
+services:
+  redis:
+    container_name: coupon-redis
+    image: redis:7.2-alpine
+    command: redis-server --port 6380
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - 6380:6380
+
+  mysql:
+    container_name: coupon-mysql
+    image: ubuntu/mysql:edge
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --explicit_defaults_for_timestamp=1
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=coupon
+      - MYSQL_USER=abcd
+      - MYSQL_PASSWORD=1234
+      - MYSQL_ROOT_PASSWORD=1234
+      - TZ=UTC
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+    volumes:
+      - ./mysql/init:/docker-entrypoint-initdb.d
+
+  cadvisor:
+    profiles:
+      - "all"
+      - "pipeline-minimal"
+    image: gcr.io/cadvisor/cadvisor:v0.47.1 # m1/m2 mac
+    privileged: true # stops oom warning
+    platform: linux/aarch64 # m1/m2 mac
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    ports:
+      - 8080:8080
+    restart: always
+    deploy:
+      mode: global

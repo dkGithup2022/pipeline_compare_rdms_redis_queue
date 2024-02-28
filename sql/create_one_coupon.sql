@@ -1,0 +1,2 @@
+
+INSERT INTO coupon.coupon (discount_amount, issued_quantity, min_available_amount, total_quantity, date_issue_ended, date_issue_started, id, title, type) VALUES (100, 0, 0, 100000, '2024-05-25 14:57:46.000000', '2024-01-25 14:57:37.000000', 1, 'title', 'FIRST_COME_FIRST_SERVED')
