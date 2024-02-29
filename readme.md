@@ -18,6 +18,20 @@
 알림, 쿠폰, 피드등의 기능은 비동기 큐를 미리 두어서 확장시 시스템을 걷어내지 않게 캐어를 할 수 있습니다. 
 게다가 redis 는 rdms 보다 추가하기 쉽습니다. 
 
+</br>
+
+
+##### 요청마다 직접 RDMS에 넣기 ( with redis 분산락) : 60 RPS
+![](locust/coupon_issue/withRedisLock/60RPS.png)
+
+##### 요청시 redis queue 로 기입  : 2000 RPS
+
+![](locust/coupon_issue/asyncWithScript/2000RPS.png)
+
+##### 큐에 있는 데이터 배치처리 : 600 Rows per sec
+
+![](locust/coupon_issue/asyncWithScript/batch_consume_560Rows_per_sec.png)
+
 
 
 </br>
@@ -66,7 +80,7 @@ select..for update 는 쿼리가 많아지면 문제 발생했을 때, 추적하
 
 ### 분산락 을 통한 쿠폰 유효성 검증 후 rdms 에 이력 생성 : 100  rows per sec
 
-![](/Users/gimdohyeon/code2024/coupon2/locust/coupon_issue/withRedisLock/60RPS.png)
+![](locust/coupon_issue/withRedisLock/60RPS.png)
 
 60 RPS -> 버벅 거릴때 테스트 돌려서 60 나오는데, 보통 100 ~ 120 정도... 사진 다시찍기 귀찬아서 60짜리 올림.
 
@@ -132,7 +146,8 @@ public class RedisDistributeLockManager {
 
 #### 검증 후 비동기 요청으로 큐에 요청 쌓기 : 2000 rows per sec
 
-![](/Users/gimdohyeon/code2024/coupon2/locust/coupon_issue/asyncWithScript/2000RPS.png)
+![](locust/coupon_issue/asyncWithScript/2000RPS.png)
+
 
 
 #### 주요 함수 
@@ -194,7 +209,7 @@ public class RedisDistributeLockManager {
 
 #### 큐에 있는 요청 배치 처리 - coupon-consumer
 
-![](/Users/gimdohyeon/code2024/coupon2/locust/coupon_issue/asyncWithScript/batch_consume_560Rows_per_sec.png)
+![](locust/coupon_issue/asyncWithScript/batch_consume_560Rows_per_sec.png)
 
 배치 업데이트 초당 500 개 
 
