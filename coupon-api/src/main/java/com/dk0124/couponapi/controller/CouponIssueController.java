@@ -33,12 +33,13 @@ public class CouponIssueController {
         return ResponseEntity.ok().build();
     }
 
+    /*
     @PostMapping("/withLock")
     public ResponseEntity issueWithLock(@RequestBody CouponIssueRequestDto couponIssueRequestDto) {
         couponIssueRequestService.issueRequestV2(couponIssueRequestDto);
         return ResponseEntity.ok().build();
     }
-
+     */
 
     @PostMapping("/withRedisLock")
     public ResponseEntity issueWithRedisLock(@RequestBody CouponIssueRequestDto couponIssueRequestDto) {

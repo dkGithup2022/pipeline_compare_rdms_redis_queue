@@ -14,14 +14,16 @@ public class CouponIssueRequestService {
     private final CouponIssueService couponIssueService;
 
     public synchronized void issueRequestV1(CouponIssueRequestDto requestDto) {
-        couponIssueService.issue(requestDto.couponId(), requestDto.userId());
+        couponIssueService.issueSyncronized(requestDto.couponId(), requestDto.userId());
         log.info("쿠폰 발급 완료 couponId : %s , userId : %s ", requestDto.couponId(), requestDto.userId());
     }
 
+    /*
     public void issueRequestV2(CouponIssueRequestDto requestDto) {
         couponIssueService.issueWithLock(requestDto.couponId(), requestDto.userId());
         log.info("쿠폰 발급 완료 couponId : %s , userId : %s ", requestDto.couponId(), requestDto.userId());
     }
+     */
 
     public void issueRequestNeedRedis(CouponIssueRequestDto requestDto) {
         couponIssueService.issue(requestDto.couponId(), requestDto.userId());

@@ -19,6 +19,7 @@ public class CouponAsyncService {
     private final ObjectMapper objectMapper;
 
     public void asyncIssue(long couponId, long userId) {
+        // coupon 을 로컬 캐시 & redis cache
         var cachedCoupon = couponCacheService.getCouponCache(couponId);
 
         cachedCoupon.checkIssuable(
@@ -41,12 +42,8 @@ public class CouponAsyncService {
     }
 
     public void issueRequestWithScript(long couponId, long userId) {
-        // 1. if on coupon more than or equal  to total amount -> fail
-        // 2. if couponId + key already on set -> fail
-        // 3. else : do add set & do add list
-        var cachedCoupon = couponCacheService.getCouponCache(couponId);
+        var cachedCoupon = couponCacheService.getCouponCache(couponId); // 쿠폰 메타 데이터에 대한 로컬 & redis cache
         redisRepository.issueRequestWithScript(couponId,userId, cachedCoupon.getTotalQuantity());
-
     }
 
     private void issueRequest(long couponId, long userId) {

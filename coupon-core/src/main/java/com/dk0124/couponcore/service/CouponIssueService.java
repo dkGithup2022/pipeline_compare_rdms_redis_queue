@@ -25,7 +25,14 @@ public class CouponIssueService {
     private final CouponIssueRepository couponIssueRepository;
 
     @Transactional
-    public synchronized void issue(long couponId, long userId) {
+    public synchronized void issueSyncronized(long couponId, long userId) {
+        var coupon = findCoupon(couponId);
+        coupon.issue();
+        saveCouponIssue(couponId, userId);
+    }
+
+    @Transactional
+    public  void issue(long couponId, long userId) {
         var coupon = findCoupon(couponId);
         coupon.issue();
         saveCouponIssue(couponId, userId);

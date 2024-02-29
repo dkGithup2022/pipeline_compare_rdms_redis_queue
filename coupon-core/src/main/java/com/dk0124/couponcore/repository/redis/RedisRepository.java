@@ -59,6 +59,7 @@ public class RedisRepository {
         var issueRequestQueueKey = RedisKey.getIssueRequestKey();
         var couponIssueRequest = new CouponIssueRequest(couponId, userId);
         try {
+            // coupon 검증 후 발급에 redis 통신 횟수를 줄이기 위한 script 쿼리 ( 잠재적인 동시성 이슈도 해결된다. )
             String code = redisTemplate.execute(
                     asyncIssueScript,
                     List.of(couponIssueSetKey, issueRequestQueueKey),
@@ -87,5 +88,29 @@ public class RedisRepository {
                 return '3'
                 """;
         return RedisScript.of(script, String.class);
+    }
+
+    public List<String> popItemsWithScript(String listKey, int n) {
+        // Lua 스크립트
+        String luaScript = """
+        local listLength = redis.call('LLEN', KEYS[1])
+        local n = tonumber(ARGV[1])
+        if n > listLength then
+            n = listLength
+        end
+        
+        if n == 0 then
+            return {}
+        end
+        
+        local items = redis.call('LRANGE', KEYS[1], 0, n - 1)
+        redis.call('LTRIM', KEYS[1], n, -1)
+        return items
+        """;
+
+        // 스크립트 실행
+        RedisScript<List> script = RedisScript.of(luaScript, List.class);
+        List<String> result = redisTemplate.execute(script, List.of(listKey), String.valueOf(n));
+        return result;
     }
 }
